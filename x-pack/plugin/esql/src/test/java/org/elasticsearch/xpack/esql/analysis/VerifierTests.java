@@ -1998,6 +1998,17 @@ public class VerifierTests extends AnalyzerTestCase {
         );
     }
 
+    public void testRuntimeScorerAndScoreOutsideAConjunction() throws Exception {
+        String prefix = "from test metadata _score | eval t = to_text(concat(title, body)) | where ";
+        String message = "[_score] can only be combined with runtime search [MATCH] using AND";
+        fullText().error(prefix + "match(t, \"cat\") or _score > 1.5", containsString(message));
+        fullText().error(prefix + "not (match(t, \"cat\") and _score > 1.5)", containsString(message));
+
+        // A conjunction can be split so _score is compared after the search has scored.
+        fullText().query(prefix + "match(t, \"cat\") and _score > 1.5");
+        fullText().query(prefix + "match(t, \"cat\") and (_score > 1.5 or title == \"dog\")");
+    }
+
     public void testToTextAnalyzerOption() throws Exception {
         // the values analyzer of a runtime text expression is declared on TO_TEXT; a registered analyzer is accepted
         fullText().query("from test | eval t = to_text(concat(title, body), {\"analyzer\": \"whitespace\"}) | where match(t, \"cat\")");
