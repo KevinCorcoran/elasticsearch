@@ -2294,7 +2294,7 @@ public class VerifierTests extends AnalyzerTestCase {
         // the same with differing function types, which pins *which* of the two is rejected
         fullText().error(
             "from test | eval t = to_text(concat(title, body)) | limit 10 | where match(t, \"cat\") or match_phrase(title, \"dog\")",
-            containsString("[MatchPhrase] function cannot be used after LIMIT")
+            containsString("[MATCH_PHRASE] function cannot be used after LIMIT")
         );
         fullText().error(
             "from test | eval t = to_text(concat(title, body)) | limit 10 | where match_phrase(t, \"cat\") or title : \"dog\"",
