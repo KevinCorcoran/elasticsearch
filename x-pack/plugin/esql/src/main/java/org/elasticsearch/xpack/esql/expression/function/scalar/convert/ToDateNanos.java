@@ -117,6 +117,13 @@ public class ToDateNanos extends AbstractConvertFunction implements Configuratio
     protected Map<DataType, BuildFactory> factories() {
         if (lazyEvaluators == null) {
             Map<DataType, BuildFactory> evaluators = new HashMap<>(STATIC_EVALUATORS);
+            // EVIDENCE for #164188 - not for merge: simulate the field store becoming visible before putAll
+            lazyEvaluators = evaluators;
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
             evaluators.putAll(
                 Map.ofEntries(
                     Map.entry(
